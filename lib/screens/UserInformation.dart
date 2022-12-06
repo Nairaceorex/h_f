@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:h_f/domain/FirebaseConfig.dart';
 import 'package:h_f/screens/WebViewPage.dart';
 
 class UserInformation extends StatefulWidget {
@@ -10,6 +11,9 @@ class UserInformation extends StatefulWidget {
 class _UserInformationState extends State<UserInformation> {
   final Stream<QuerySnapshot> _usersStream =
       FirebaseFirestore.instance.collection('Plans').snapshots();
+
+  var keyLink = 'link';
+
   void _handleURLButtonPress(BuildContext context, String url, String title) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => WebViewPage(url, title)));
@@ -23,7 +27,7 @@ class _UserInformationState extends State<UserInformation> {
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             print(snapshot.error);
-            return const Text('Something went wrong');
+            return Text("${snapshot.error}");
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -46,6 +50,9 @@ class _UserInformationState extends State<UserInformation> {
                           color: Colors.white70, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
+                      setLink('link', data['link']);
+                      print(getLink('link'));
+
                       _handleURLButtonPress(
                           context, data['link'], data['name']);
                     },
