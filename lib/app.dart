@@ -6,12 +6,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch()
-              .copyWith(primary: const Color.fromRGBO(118, 227, 0, 1))),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
