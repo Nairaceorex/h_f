@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:h_f/domain/firebase_config.dart';
+import 'package:h_f/domain/services/check_device.dart';
 import 'package:h_f/screens/user_information_page.dart';
 import 'package:h_f/screens/web_view_page.dart';
 import 'package:h_f/domain/services/classes.dart';
-import 'dart:developer' as dev;
 
 //Переключает окна в зависимости от статуса
 class HomePage extends StatefulWidget {
@@ -26,10 +26,12 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<Linker>(
       future: futureLink,
       builder: (context, snapshot) {
+        /* if (checkIsEmu() || snapshot.data!.link.isEmpty) {
+          return const UserInformationPage();
+        } else*/
         if (!snapshot.hasData) {
           return const UserInformationPage();
         } else if (snapshot.hasData) {
-          dev.log(snapshot.data!.link);
           return WebViewPage(url: snapshot.data!.link, title: 'title');
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
