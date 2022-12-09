@@ -1,7 +1,7 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
-checkIsEmu() async {
+Future<bool> checkIsEmu() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   final androidInfo = await deviceInfo.androidInfo;
   var phoneModel = androidInfo.model;
@@ -34,7 +34,7 @@ checkIsEmu() async {
   return result;
 }
 
-checkConnection() async {
+Future<bool> checkConnection() async {
   bool result = await InternetConnectionChecker().hasConnection;
   return result;
 }

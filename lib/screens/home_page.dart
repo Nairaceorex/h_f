@@ -16,25 +16,51 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Linker> futureLink;
+  late Future<bool> futureCheckConnection;
+  late Future<bool> futureCheckIsEmu;
+
   @override
   void initState() {
     super.initState();
     futureLink = getLink('link');
+    /*futureCheckConnection = checkConnection();
+    futureCheckIsEmu = checkIsEmu();*/
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Linker>(
-      future: futureLink,
-      builder: (context, snapshot) {
-        if (!checkConnection()) {
+    return FutureBuilder(
+      future: Future.wait([checkConnection(), checkIsEmu()]),
+      builder: (context, AsyncSnapshot<List<bool>> snapshot1) {
+        if (!snapshot1.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot1.hasData) {
+          return FutureBuilder<Linker>(
+              future: futureLink,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const UserInformationPage();
+                } else if (snapshot.hasData) {
+                  if (!snapshot1.data![0]) {
+                    return const ErrorPage();
+                  } else if (snapshot1.data![0]) {
+                    return WebViewPage(url: snapshot.data!.link);
+                  }
+                }
+                return const CircularProgressIndicator();
+              });
+        }
+        if (!snapshot1.data![0]) {
           return const ErrorPage();
-        } else if (checkIsEmu() || snapshot.data!.link.isEmpty) {
+        } else if (snapshot1.data![1]
+            // || snapshot.data![0].link.isEmpty
+            ) {
           return const UserInformationPage();
-        } else if (snapshot.hasData) {
-          return WebViewPage(url: snapshot.data!.link);
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
+        } /*else if (snapshot.hasData) {
+          return WebViewPage(url: snapshot.data![0].link);
+        }*/
+        else if (snapshot1.hasError) {
+          return Text('${snapshot1.error}');
         }
         return const CircularProgressIndicator();
       },
