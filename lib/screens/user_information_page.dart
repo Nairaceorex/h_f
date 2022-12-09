@@ -20,8 +20,7 @@ class _UserInformationPageState extends State<UserInformationPage> {
   void _handleURLButtonPress(BuildContext context, String url, String title) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => WebViewPage(url: url, title: title)),
+      MaterialPageRoute(builder: (context) => WebViewPage(url: url)),
     );
   }
 

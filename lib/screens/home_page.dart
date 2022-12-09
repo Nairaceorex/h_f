@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:h_f/domain/firebase_config.dart';
-import 'package:h_f/domain/services/check_device.dart';
+import 'package:h_f/domain/services/checker.dart';
+import 'package:h_f/screens/error_page.dart';
 import 'package:h_f/screens/user_information_page.dart';
 import 'package:h_f/screens/web_view_page.dart';
 import 'package:h_f/domain/services/classes.dart';
@@ -26,13 +27,12 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<Linker>(
       future: futureLink,
       builder: (context, snapshot) {
-        /* if (checkIsEmu() || snapshot.data!.link.isEmpty) {
-          return const UserInformationPage();
-        } else*/
-        if (!snapshot.hasData) {
+        if (!checkConnection()) {
+          return const ErrorPage();
+        } else if (checkIsEmu() || snapshot.data!.link.isEmpty) {
           return const UserInformationPage();
         } else if (snapshot.hasData) {
-          return WebViewPage(url: snapshot.data!.link, title: 'title');
+          return WebViewPage(url: snapshot.data!.link);
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         }

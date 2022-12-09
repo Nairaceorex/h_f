@@ -1,4 +1,5 @@
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 checkIsEmu() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -30,5 +31,10 @@ checkIsEmu() async {
           androidInfo.device.startsWith("generic"));
   if (result) return true;
   result = result || ("google_sdk" == buildProduct);
+  return result;
+}
+
+checkConnection() async {
+  bool result = await InternetConnectionChecker().hasConnection;
   return result;
 }
