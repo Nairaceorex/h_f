@@ -29,13 +29,58 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.wait([checkConnection(), checkIsEmu()]),
-      builder: (context, AsyncSnapshot<List<bool>> snapshot1) {
-        if (!snapshot1.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot1.hasData) {
-          return FutureBuilder<Linker>(
+    return FutureBuilder<Linker>(
+      future: futureLink,
+      builder: (context, snapshotLink) {
+        if (!snapshotLink.hasData) {
+          return const UserInformationPage();
+        } else if (snapshotLink.hasData) {
+          return FutureBuilder(
+            future: Future.wait([checkConnection(), checkIsEmu()]),
+            builder: (context, AsyncSnapshot<List<bool>> snapshotCheck) {
+              if (!snapshotCheck.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshotCheck.hasData) {
+                if (!snapshotCheck.data![0]) {
+                  return const ErrorPage();
+                } else if (snapshotCheck.data![0]) {
+                  return WebViewPage(url: snapshotLink.data!.link);
+                }
+
+                /*if (snapshotLink.data!.link.isEmpty) {
+                  return UserInformationPage();
+                }*/
+              }
+              /*if (!snapshot1.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot1.hasData) {
+            return Text('data');
+          }
+          if (!snapshot1.data![0]) {
+            return const ErrorPage();
+          } else if (snapshot1.data![1]
+              // || snapshot.data![0].link.isEmpty
+              ) {
+            return const UserInformationPage();
+          } /*else if (snapshot.hasData) {
+            return WebViewPage(url: snapshot.data![0].link);
+          }*/
+          else if (snapshot1.hasError) {
+            return Text('${snapshot1.error}');
+          }*/
+              return const CircularProgressIndicator();
+            },
+          );
+        } else if (snapshotLink.hasError) {
+          return Text('${snapshotLink.error}');
+        }
+        return const CircularProgressIndicator();
+      },
+    );
+  }
+}
+/*
+FutureBuilder<Linker>(
               future: futureLink,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -49,21 +94,4 @@ class _HomePageState extends State<HomePage> {
                 }
                 return const CircularProgressIndicator();
               });
-        }
-        if (!snapshot1.data![0]) {
-          return const ErrorPage();
-        } else if (snapshot1.data![1]
-            // || snapshot.data![0].link.isEmpty
-            ) {
-          return const UserInformationPage();
-        } /*else if (snapshot.hasData) {
-          return WebViewPage(url: snapshot.data![0].link);
-        }*/
-        else if (snapshot1.hasError) {
-          return Text('${snapshot1.error}');
-        }
-        return const CircularProgressIndicator();
-      },
-    );
-  }
-}
+        */
