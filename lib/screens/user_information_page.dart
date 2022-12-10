@@ -5,7 +5,9 @@ import 'package:h_f/screens/web_view_page.dart';
 import 'dart:developer' as dev;
 
 class UserInformationPage extends StatefulWidget {
-  const UserInformationPage({super.key});
+  final String title;
+
+  const UserInformationPage({super.key, required this.title});
 
   @override
   State<UserInformationPage> createState() => _UserInformationPageState();
@@ -45,22 +47,26 @@ class _UserInformationPageState extends State<UserInformationPage> {
                   Map<String, dynamic> data =
                       document.data()! as Map<String, dynamic>;
 
-                  return MaterialButton(
-                    color: Colors.blue,
-                    child: Text(
-                      data['name'],
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () {
-                      setLink('link', data['link']);
-                      dev.log(getLink('link').toString());
+                  return Column(
+                    children: [
+                      MaterialButton(
+                        color: Colors.blue,
+                        child: Text(
+                          widget.title,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          setLink('link', data['link']);
+                          dev.log(getLink('link').toString());
 
-                      _handleURLButtonPress(
-                          context, data['link'], data['name']);
-                    },
+                          _handleURLButtonPress(
+                              context, data['link'], data['name']);
+                        },
+                      ),
+                    ],
                   );
                 })
                 .toList()

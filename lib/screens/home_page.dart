@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     futureLink = getLink('link');
-    /*futureCheckConnection = checkConnection();
-    futureCheckIsEmu = checkIsEmu();*/
+    futureCheckConnection = checkConnection();
+    futureCheckIsEmu = checkIsEmu();
   }
 
   @override
@@ -33,7 +33,26 @@ class _HomePageState extends State<HomePage> {
       future: futureLink,
       builder: (context, snapshotLink) {
         if (!snapshotLink.hasData) {
-          return const UserInformationPage();
+          return FutureBuilder(
+              future: futureCheckIsEmu,
+              builder: (context, snapshotCheckEmu) {
+                if (!snapshotCheckEmu.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshotCheckEmu.hasData) {
+                  if (snapshotCheckEmu.data!) {
+                    return const UserInformationPage(
+                      title: 'This is Emu',
+                    );
+                  } else if (!snapshotCheckEmu.data!) {
+                    return const UserInformationPage(
+                        title: 'This is Real Device!');
+                  }
+                } else if (snapshotCheckEmu.hasError) {
+                  return Text('${snapshotCheckEmu.error}');
+                }
+                return const CircularProgressIndicator();
+              });
         } else if (snapshotLink.hasData) {
           return FutureBuilder(
             future: Future.wait([checkConnection(), checkIsEmu()]),
@@ -50,6 +69,8 @@ class _HomePageState extends State<HomePage> {
                 /*if (snapshotLink.data!.link.isEmpty) {
                   return UserInformationPage();
                 }*/
+              } else if (snapshotCheck.hasError) {
+                return Text('${snapshotCheck.error}');
               }
               /*if (!snapshot1.hasData) {
             return const Center(child: CircularProgressIndicator());
