@@ -28,51 +28,54 @@ class _UserInformationPageState extends State<UserInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _usersStream,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            dev.log(snapshot.error.toString());
-            return Text("${snapshot.error}");
-          }
+    return SafeArea(
+      child: Scaffold(
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _usersStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              dev.log(snapshot.error.toString());
+              return Text("${snapshot.error}");
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text("Loading");
-          }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text("Loading");
+            }
 
-          return ListView(
-            children: snapshot.data!.docs
-                .map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
+            return ListView(
+              children: snapshot.data!.docs
+                  .map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                        document.data()! as Map<String, dynamic>;
 
-                  return Column(
-                    children: [
-                      MaterialButton(
-                        color: Colors.blue,
-                        child: Text(
-                          widget.title,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                    return Column(
+                      children: [
+                        MaterialButton(
+                          color: Colors.blue,
+                          child: Text(
+                            widget.title,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        onPressed: () {
-                          setLink('link', data['link']);
-                          dev.log(getLink('link').toString());
+                          onPressed: () {
+                            setLink('link', data['link']);
+                            dev.log(getLink('link').toString());
 
-                          _handleURLButtonPress(
-                              context, data['link'], data['name']);
-                        },
-                      ),
-                    ],
-                  );
-                })
-                .toList()
-                .cast(),
-          );
-        },
+                            _handleURLButtonPress(
+                                context, data['link'], data['name']);
+                          },
+                        ),
+                      ],
+                    );
+                  })
+                  .toList()
+                  .cast(),
+            );
+          },
+        ),
       ),
     );
   }

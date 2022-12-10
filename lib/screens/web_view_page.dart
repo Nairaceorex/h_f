@@ -30,19 +30,21 @@ class _WebViewPageState extends State<WebViewPage> {
         }
         return false;
       },
-      child: Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-              child: WebView(
-                initialUrl: widget.url,
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (controller) {
-                  _webViewController = controller;
-                },
+      child: SafeArea(
+        child: Scaffold(
+          body: Column(
+            children: [
+              Expanded(
+                child: WebView(
+                  initialUrl: widget.url,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (controller) {
+                    _webViewController = controller;
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

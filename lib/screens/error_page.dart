@@ -5,12 +5,14 @@ class ErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.redAccent,
-      body: Center(
-        child: Text(
-          'Для работы приложения необходим доступ к сети',
-          style: TextStyle(color: Colors.yellowAccent),
+    return const SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.redAccent,
+        body: Center(
+          child: Text(
+            'Для работы приложения необходим доступ к сети',
+            style: TextStyle(color: Colors.yellowAccent),
+          ),
         ),
       ),
     );
