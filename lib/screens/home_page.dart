@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:h_f/domain/firebase_config.dart';
 import 'package:h_f/domain/services/checker.dart';
@@ -15,9 +16,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Stream<QuerySnapshot> _usersStream =
+      FirebaseFirestore.instance.collection('Plans').snapshots();
   late Future<Linker> futureLink;
   late Future<bool> futureCheckConnection;
   late Future<bool> futureCheckIsEmu;
+  late Future<String?> futureCity;
+
+  Future<String?> getDataOnce_customObjects() async {
+    // [START get_data_once_custom_objects]
+    final ref = FirebaseFirestore.instance
+        .collection("Plans")
+        .doc("Healthy")
+        .withConverter(
+          fromFirestore: City.fromFirestore,
+          toFirestore: (City city, _) => city.toFirestore(),
+        );
+    final docSnap = await ref.get();
+    final city = docSnap.data(); // Convert to City object
+    return city!.link;
+    // [END get_data_once_custom_objects]
+  }
 
   @override
   void initState() {
@@ -25,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     futureLink = getLink('link');
     futureCheckConnection = checkConnection();
     futureCheckIsEmu = checkIsEmu();
+    futureCity = getDataOnce_customObjects();
   }
 
   @override
@@ -33,26 +53,93 @@ class _HomePageState extends State<HomePage> {
       future: futureLink,
       builder: (context, snapshotLink) {
         if (!snapshotLink.hasData) {
-          return FutureBuilder(
-              future: futureCheckIsEmu,
-              builder: (context, snapshotCheckEmu) {
-                if (!snapshotCheckEmu.hasData) {
-                  return const Center(child: CircularProgressIndicator());
+          /*Future<City?> getDataOnce_customObjects() async {
+            // [START get_data_once_custom_objects]
+            final ref = FirebaseFirestore.instance
+                .collection("Plans")
+                .doc("Healthy")
+                .withConverter(
+                  fromFirestore: City.fromFirestore,
+                  toFirestore: (City city, _) => city.toFirestore(),
+                );
+            final docSnap = await ref.get();
+            final city = docSnap.data(); // Convert to City object
+            return city;
+            // [END get_data_once_custom_objects]
+          }
+
+          getDataOnce_customObjects();*/
+          return FutureBuilder<String?>(
+              future: futureCity,
+              builder: (context, snapshotCity) {
+                if (snapshotCity.hasData) {
+                  return FutureBuilder(
+                      future: futureCheckIsEmu,
+                      builder: (context, snapshotCheckEmu) {
+                        if (!snapshotCheckEmu.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshotCheckEmu.hasData) {
+                          if (snapshotCheckEmu.data! ||
+                              snapshotCity.data!.isEmpty) {
+                            return const UserInformationPage(
+                              title: 'This is Emu',
+                            );
+                          } else if (!snapshotCheckEmu.data! ||
+                              snapshotCity.data!.isNotEmpty) {
+                            setLink('link', snapshotCity.data!);
+                            return WebViewPage(url: snapshotCity.data!);
+                          }
+                        } else if (snapshotCheckEmu.hasError) {
+                          return Text('${snapshotCheckEmu.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      });
                 }
-                if (snapshotCheckEmu.hasData) {
-                  if (snapshotCheckEmu.data!) {
-                    return const UserInformationPage(
-                      title: 'This is Emu',
-                    );
-                  } else if (!snapshotCheckEmu.data!) {
-                    return const UserInformationPage(
-                        title: 'This is Real Device!');
-                  }
-                } else if (snapshotCheckEmu.hasError) {
-                  return Text('${snapshotCheckEmu.error}');
-                }
-                return const CircularProgressIndicator();
+                return CircularProgressIndicator();
               });
+          /*StreamBuilder<QuerySnapshot>(
+              stream: _usersStream,
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshotData) {
+                if (!snapshotData.hasData) {
+                  return Text('data');
+                } else if (snapshotData.hasError) {
+                  return Text('${snapshotData.error}');
+                }
+                return FutureBuilder(
+                    future: futureCheckIsEmu,
+                    builder: (context, snapshotCheckEmu) {
+                      if (!snapshotCheckEmu.hasData) {
+                        return Text('data2');
+                      }
+                      if (snapshotCheckEmu.hasData) {
+                        snapshotData.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data()! as Map<String, dynamic>;
+                          if (snapshotCheckEmu.data! ||
+                              data['link'] == '' ||
+                              data['link'] == null) {
+                            return const UserInformationPage(
+                              title: 'This is Emu',
+                            );
+                          } else if (!snapshotCheckEmu.data! ||
+                              data['link'] != '' ||
+                              data['link'] != null) {
+                            setLink('link', data['link']);
+                            return WebViewPage(url: data['link']);
+                          }
+                        });
+                      } else if (snapshotCheckEmu.hasError) {
+                        return Text('${snapshotCheckEmu.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    });
+                ;
+              });
+       */
         } else if (snapshotLink.hasData) {
           return FutureBuilder(
             future: Future.wait([checkConnection(), checkIsEmu()]),
@@ -115,4 +202,28 @@ FutureBuilder<Linker>(
                 }
                 return const CircularProgressIndicator();
               });
+        */
+
+        /*
+        FutureBuilder(
+                    future: futureCheckIsEmu,
+                    builder: (context, snapshotCheckEmu) {
+                      if (!snapshotCheckEmu.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshotCheckEmu.hasData) {
+                        if (snapshotCheckEmu.data!) {
+                          return const UserInformationPage(
+                            title: 'This is Emu',
+                          );
+                        } else if (!snapshotCheckEmu.data!) {
+                          return const UserInformationPage(
+                              title: 'This is Real Device!');
+                        }
+                      } else if (snapshotCheckEmu.hasError) {
+                        return Text('${snapshotCheckEmu.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    });
+              
         */
